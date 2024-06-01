@@ -38,6 +38,11 @@ namespace QuanLyQuanCafe.Forms
             dgvTimKiemHDB.Columns[2].HeaderText = "Mã nhân viên";
             dgvTimKiemHDB.Columns[3].HeaderText = "Mã khách hàng";
             dgvTimKiemHDB.Columns[4].HeaderText = "Tổng tiền";
+            dgvTimKiemHDB.Columns[0].Width = 150;
+            dgvTimKiemHDB.Columns[1].Width = 100;
+            dgvTimKiemHDB.Columns[2].Width = 100;
+            dgvTimKiemHDB.Columns[3].Width = 100;
+            dgvTimKiemHDB.Columns[4].Width = 100;
             dgvTimKiemHDB.AllowUserToAddRows = false;
             dgvTimKiemHDB.EditMode = DataGridViewEditMode.EditProgrammatically;
         }
@@ -70,7 +75,7 @@ namespace QuanLyQuanCafe.Forms
             if (txtTongTien.Text != "")
                 sql = sql + " AND TongTien <=" + txtTongTien.Text;
             if (dtpNgayBan.Checked)
-                sql = sql + " AND NgaySinh = '" + dtpNgayBan.Value.ToString("yyyy-MM-dd") + "'";
+                sql = sql + " AND CONVERT(date, NgayBan) = '" + dtpNgayBan.Value.ToString("yyyy-MM-dd") + "'";
             tblHoaDonBan = Class.Functions.GetDataToTable(sql);
             if (tblHoaDonBan.Rows.Count == 0)
             {

@@ -94,7 +94,6 @@ namespace QuanLyQuanCafe.Class
             else
                 return false;
         }
-
         public static string ConvertDateTime(string d)
         {
             string[] parts = d.Split('/');

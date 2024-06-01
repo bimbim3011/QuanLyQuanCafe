@@ -34,7 +34,7 @@ namespace QuanLyQuanCafe.Forms
             comboMaNV.SelectedIndex = -1;
             Functions.FillCombo("select MaSP, TenSP from tblSanPham", comboMaSP, "MaSP", "TenSP");
             comboMaSP.SelectedIndex = -1;
-            Functions.FillCombo("select MaHDB from tblChiTietHDB", comboMaHD, "MaHDB", "MaHDB");
+            Functions.FillCombo("select MaHDB from tblHoaDonBan", comboMaHD, "MaHDB", "MaHDB");
             comboMaHD.SelectedIndex = -1;
         }
 
@@ -65,14 +65,14 @@ namespace QuanLyQuanCafe.Forms
             dataGridViewHoadon.Columns[8].HeaderText = "Tên khách hàng";
             dataGridViewHoadon.Columns[9].HeaderText = "Tên nhân viên";
 
-            dataGridViewHoadon.Columns[0].Width = 100;
+            dataGridViewHoadon.Columns[0].Width = 150;
             dataGridViewHoadon.Columns[1].Width = 150;
             dataGridViewHoadon.Columns[2].Width = 100;
             dataGridViewHoadon.Columns[3].Width = 100;
             dataGridViewHoadon.Columns[4].Width = 100;
             dataGridViewHoadon.Columns[5].Width = 100;
             dataGridViewHoadon.Columns[6].Width = 100;
-            dataGridViewHoadon.Columns[7].Width = 100;
+            dataGridViewHoadon.Columns[7].Width = 150;
             dataGridViewHoadon.Columns[8].Width = 150;
             dataGridViewHoadon.Columns[9].Width = 150;
 
@@ -82,8 +82,8 @@ namespace QuanLyQuanCafe.Forms
 
         private void Load_DataGridViewSanpham()
         {
-            dataGridViewSanpham.Columns[0].HeaderText = "Ten San Pham";
-            dataGridViewSanpham.Columns[1].HeaderText = "So Luong";
+            dataGridViewSanpham.Columns[0].HeaderText = "Tên sản phẩm";
+            dataGridViewSanpham.Columns[1].HeaderText = "Số lượng";
 
             dataGridViewSanpham.Columns[0].Width = 150;
             dataGridViewSanpham.Columns[1].Width = 120;
@@ -125,7 +125,7 @@ namespace QuanLyQuanCafe.Forms
                     maskNgay.Text = "";
                     return;
                 }
-                sql = sql + " AND a.NgayBan='" + Functions.ConvertDateTime(maskNgay.Text) + "'";
+                sql = sql + " AND CONVERT(date, a.NgayBan)='" + Functions.ConvertDateTime(maskNgay.Text) + "'";
             }
             if (maskedNgaybd.Text != "  /  /")
             {
@@ -168,7 +168,7 @@ namespace QuanLyQuanCafe.Forms
                     maskedNgaykt.Text = "";
                     return;
                 }
-                sql = sql + " AND (a.NgayBan BETWEEN '" + Functions.ConvertDateTime(maskedNgaybd.Text) + "' AND '" + Functions.ConvertDateTime(maskedNgaykt.Text) + "')";
+                sql = sql + " AND (CONVERT(date, a.NgayBan) BETWEEN '" + Functions.ConvertDateTime(maskedNgaybd.Text) + "' AND '" + Functions.ConvertDateTime(maskedNgaykt.Text) + "')";
             }
             if (comboMaKH.SelectedValue != null)
             {
@@ -179,13 +179,16 @@ namespace QuanLyQuanCafe.Forms
                 sql = sql + " AND e.TenNV LIKE N'%" + comboMaNV.Text + "%'";
             }
             tblDSHD = Class.Functions.GetDataToTable(sql);
-            if (tblDSHD.Rows.Count == 0)
+            var countHDB = tblDSHD.AsEnumerable().Select(row => row.Field<string>("MaHDB")).Distinct().Count();
+            if (countHDB == 0)
             {
                 MessageBox.Show("Không có hóa đơn bán nào thỏa mãn điều kiện!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 ResetValues();
             }
             else
-                MessageBox.Show("Có " + tblDSHD.Rows.Count + " hóa đơn bán thỏa mãn điều kiện", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            {
+                MessageBox.Show("Có " + countHDB + " hóa đơn bán thỏa mãn điều kiện", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
             dataGridViewHoadon.DataSource = tblDSHD;
             Load_DataGridViewHDB();
             //sql1 = "SELECT * FROM tblSanPham";
@@ -202,13 +205,18 @@ namespace QuanLyQuanCafe.Forms
                             TongSoLuong = g.Sum(r => r.Field<int>("SoLuong"))
                         };
 
+            int tongSLSanPham = 0;
+
             foreach (var item in query)
             {
                 DataRow newRow = tblSP.NewRow();
                 newRow["TenSP"] = item.TenSP;
                 newRow["TongSoLuong"] = item.TongSoLuong;
                 tblSP.Rows.Add(newRow);
+
+                tongSLSanPham += item.TongSoLuong;
             }
+
             dataGridViewSanpham.DataSource = tblSP;
             Load_DataGridViewSanpham();
         }
@@ -232,7 +240,7 @@ namespace QuanLyQuanCafe.Forms
             exRange.Range["A2:P2"].Font.ColorIndex = 3; //Màu đỏ
             exRange.Range["A2:P2"].MergeCells = true;
             exRange.Range["A2:P2"].HorizontalAlignment = COMExcel.XlHAlign.xlHAlignCenter;
-            exRange.Range["A2:P2"].Value = "Danh sách Bán hàng ";
+            exRange.Range["A2:P2"].Value = "DANH SÁCH BÁN HÀNG";
 
             exRange.Range["A4:K4"].Font.Bold = true;
             exRange.Range["A4:K4"].HorizontalAlignment = COMExcel.XlHAlign.xlHAlignCenter;

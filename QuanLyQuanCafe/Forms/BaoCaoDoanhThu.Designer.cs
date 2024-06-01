@@ -99,6 +99,7 @@
             this.btnTimKiem.TabIndex = 2;
             this.btnTimKiem.Text = "Tìm kiếm";
             this.btnTimKiem.UseVisualStyleBackColor = true;
+            this.btnTimKiem.Click += new System.EventHandler(this.btnTimKiem_Click);
             // 
             // txtDoanhThu
             // 
@@ -106,6 +107,7 @@
             this.txtDoanhThu.Name = "txtDoanhThu";
             this.txtDoanhThu.Size = new System.Drawing.Size(215, 22);
             this.txtDoanhThu.TabIndex = 9;
+            this.txtDoanhThu.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtDoanhThu_KeyPress);
             // 
             // label7
             // 
@@ -179,6 +181,7 @@
             this.txtGiaBan.Name = "txtGiaBan";
             this.txtGiaBan.Size = new System.Drawing.Size(215, 22);
             this.txtGiaBan.TabIndex = 5;
+            this.txtGiaBan.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtGiaBan_KeyPress_1);
             // 
             // cboTenSP
             // 
@@ -194,6 +197,7 @@
             this.txtSoLuong.Name = "txtSoLuong";
             this.txtSoLuong.Size = new System.Drawing.Size(215, 22);
             this.txtSoLuong.TabIndex = 3;
+            this.txtSoLuong.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtSoLuong_KeyPress_1);
             // 
             // rdTheoKhoang
             // 
@@ -205,6 +209,7 @@
             this.rdTheoKhoang.TabStop = true;
             this.rdTheoKhoang.Text = "Theo khoảng:";
             this.rdTheoKhoang.UseVisualStyleBackColor = true;
+            this.rdTheoKhoang.CheckedChanged += new System.EventHandler(this.rdTheoKhoang_CheckedChanged);
             // 
             // rdTheoNgay
             // 
@@ -216,6 +221,7 @@
             this.rdTheoNgay.TabStop = true;
             this.rdTheoNgay.Text = "Theo ngày:";
             this.rdTheoNgay.UseVisualStyleBackColor = true;
+            this.rdTheoNgay.CheckedChanged += new System.EventHandler(this.rdTheoNgay_CheckedChanged);
             // 
             // label4
             // 
@@ -288,6 +294,7 @@
             this.btnInBaoCao.TabIndex = 10;
             this.btnInBaoCao.Text = "In báo cáo";
             this.btnInBaoCao.UseVisualStyleBackColor = true;
+            this.btnInBaoCao.Click += new System.EventHandler(this.btnInBaoCao_Click);
             // 
             // btnHienThi
             // 
@@ -297,6 +304,7 @@
             this.btnHienThi.TabIndex = 12;
             this.btnHienThi.Text = "Hiển thị";
             this.btnHienThi.UseVisualStyleBackColor = true;
+            this.btnHienThi.Click += new System.EventHandler(this.btnHienThi_Click);
             // 
             // lblBangChu
             // 
@@ -324,6 +332,7 @@
             this.Name = "frmBaoCaoDoanhThu";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Báo Cáo Doanh Thu";
+            this.Load += new System.EventHandler(this.frmBaoCaoDoanhThu_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.grbKhoang.ResumeLayout(false);

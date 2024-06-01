@@ -9,6 +9,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using COMExcel = Microsoft.Office.Interop.Excel;
+using Excel = Microsoft.Office.Interop.Excel;
 
 namespace QuanLyQuanCafe.Forms
 {
@@ -19,18 +21,17 @@ namespace QuanLyQuanCafe.Forms
             InitializeComponent();
         }
         DataTable tblDT;
-        private void baocaodoanhthu_Load(object sender, EventArgs e)
+
+        private void frmBaoCaoDoanhThu_Load(object sender, EventArgs e)
         {
-            Load_DataGridView("SELECT tblHoaDonBan.NgayBan, tblSanPham.TenSP, tblChiTietHDB.SoLuong AS SoLuongBan, tblSanPham.GiaBan AS DonGiaBan, (tblChiTietHDB.SoLuong * tblSanPham.GiaBan) AS DoanhThu FROM tblHoaDonBan JOIN tblChiTietHDB ON tblHoaDonBan.MaHDB = tblChiTietHDB.MaHDB, JOIN tblSanPham ON tblChiTietHDB.MaSP = tblSanPham.MaSP;");
-            Functions.FillCombo("SELECT TenSP from tblSanPham", cboTenSP, "TenSP", "TenSP");
+            Load_DataGridView("SELECT * FROM tblDoanhThu");
+            Functions.FillCombo("SELECT TenSP FROM tblSanPham", cboTenSP, "TenSP", "TenSP");
             cboTenSP.SelectedIndex = -1;
-            txtTongTien.Text = Functions.GetFieldValues("SELECT (tblChiTietHDB.SoLuong * tblSanPham.GiaBan) AS DoanhThu FROM tblHoaDonBan");
+            txtTongTien.Text = Functions.GetFieldValues("SELECT SUM(DoanhThuSanPham) FROM tblDoanhThu");
             mskTheoNgay.Enabled = false;
             grbKhoang.Enabled = false;
             lblBangChu.Text = "Bằng chữ: " + Functions.ChuyenSoSangChu(txtTongTien.Text);
-            txtSoLuong.Text = Functions.GetFieldValues("SELECT tblChiTietHDB.SoLuong AS SoLuongBan FROM tblHoaDonBan");
             txtTongTien.Enabled = false;
-            txtSoLuong.Enabled = false;
         }
         private void Load_DataGridView(string sql)
         {
@@ -57,7 +58,26 @@ namespace QuanLyQuanCafe.Forms
             txtDoanhThu.Enabled = false;
         }
 
-        private void btntimkiem_Click(object sender, EventArgs e)
+        private void dgvBaoCaoDoanhThu_Click(object sender, EventArgs e)
+        {
+            string ma;
+
+            if (tblDT.Rows.Count == 0)
+            {
+                MessageBox.Show("Không có dữ liệu!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            mskTheoNgay.Text = dgvBaoCaoDoanhThu.CurrentRow.Cells["NgayBan"].Value.ToString();
+
+            ma = dgvBaoCaoDoanhThu.CurrentRow.Cells["TenSP"].Value.ToString();
+            cboTenSP.Text = Functions.GetFieldValues("SELECT TenSP FROM tblSanPham WHERE TenSP = N'" + ma + "'");
+
+            txtSoLuong.Text = dgvBaoCaoDoanhThu.CurrentRow.Cells["SoLuongBan"].Value.ToString();
+            txtGiaBan.Text = dgvBaoCaoDoanhThu.CurrentRow.Cells["GiaSanPham"].Value.ToString();
+            txtDoanhThu.Text = dgvBaoCaoDoanhThu.CurrentRow.Cells["DoanhThuSanPham"].Value.ToString();
+        }
+
+        private void btnTimKiem_Click(object sender, EventArgs e)
         {
             string sql;
             if (cboTenSP.SelectedValue == null && txtGiaBan.Text == "" && mskTheoNgay.Text == "  /  /" && txtDoanhThu.Text == null && mskTheoKhoang1.Text == "  /  /" && mskTheoKhoang2.Text == "  /  /")
@@ -65,15 +85,15 @@ namespace QuanLyQuanCafe.Forms
                 MessageBox.Show("Hãy nhập ít nhất 1 dữ liệu để tìm", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            sql = "select * from tbl_doanhthu where 1=1";
+            sql = "SELECT * FROM tblDoanhThu where 1=1";
             if (cboTenSP.SelectedValue != null)
             {
-                sql += " and tensanpham = N'" + cboTenSP.Text + "'";
+                sql += " AND TenSP = N'" + cboTenSP.Text + "'";
             }
 
             if (txtGiaBan.Text != "")
             {
-                sql += " and gia_san_pham = " + txtGiaBan.Text;
+                sql += " AND GiaSanPham = " + txtGiaBan.Text;
             }
             if (mskTheoNgay.Text != "  /  /")
             {
@@ -84,7 +104,7 @@ namespace QuanLyQuanCafe.Forms
                     mskTheoNgay.Text = "";
                     return;
                 }
-                sql += " and ngayban = '" + Functions.ConvertDateTime(mskTheoNgay.Text) + "'";
+                sql += " and NgayBan = '" + Functions.ConvertDateTime(mskTheoNgay.Text) + "'";
             }
             if (mskTheoKhoang1.Text != "  /  /" && mskTheoKhoang2.Text != "  /  /")
             {
@@ -103,21 +123,21 @@ namespace QuanLyQuanCafe.Forms
                     mskTheoKhoang1.Text = "";
                     return;
                 }
-                sql += " and ngayban between '" + Functions.ConvertDateTime(mskTheoKhoang1.Text) + "' and '" + Functions.ConvertDateTime(mskTheoKhoang2.Text) + "'";
+                sql += " AND NgayBan BETWEEN '" + Functions.ConvertDateTime(mskTheoKhoang1.Text) + "' AND '" + Functions.ConvertDateTime(mskTheoKhoang2.Text) + "'";
             }
             if (txtDoanhThu.Text != "")
             {
-                sql += " and doanhthusanpham >= " + txtDoanhThu.Text;
+                sql += " and DoanhThuSanPham >= " + txtDoanhThu.Text;
             }
 
             Load_DataGridView(sql);
-            txtTongTien.Text = Functions.GetFieldValues("SELECT (tblChiTietHDB.SoLuong * tblSanPham.GiaBan) AS DoanhThu FROM tblHoaDonBan WHERE " + sql.Substring(sql.IndexOf("where") + 5));
+            txtTongTien.Text = Functions.GetFieldValues("SELECT SUM(DoanhThuSanPham) FROM  tblDoanhThu WHERE " + sql.Substring(sql.IndexOf("where") + 5));
             lblBangChu.Text = "Bằng chữ: " + Functions.ChuyenSoSangChu(txtTongTien.Text);
         }
 
-        private void btnhienthi_Click(object sender, EventArgs e)
+        private void btnHienThi_Click(object sender, EventArgs e)
         {
-            string sql = "SELECT tblHoaDonBan.NgayBan, tblSanPham.TenSP, tblChiTietHDB.SoLuong AS SoLuongBan, tblSanPham.GiaBan AS DonGiaBan, (tblChiTietHDB.SoLuong * tblSanPham.GiaBan) AS DoanhThu FROM tblHoaDonBan JOIN tblChiTietHDB ON tblHoaDonBan.MaHDB = tblChiTietHDB.MaHDB, JOIN tblSanPham ON tblChiTietHDB.MaSP = tblSanPham.MaSP;";
+            string sql = "SELECT * FROM tblDoanhThu";
             Load_DataGridView(sql);
             Functions.FillCombo("SELECT TenSP FROM tblSanPham", cboTenSP, "TenSP", "TenSP");
             cboTenSP.SelectedIndex = -1;
@@ -125,7 +145,7 @@ namespace QuanLyQuanCafe.Forms
             mskTheoNgay.Text = "";
             txtSoLuong.Text = "";
             txtDoanhThu.Text = "";
-            txtTongTien.Text = Functions.GetFieldValues("SELECT (tblChiTietHDB.SoLuong * tblSanPham.GiaBan) AS DoanhThu FROM tblHoaDonBan");
+            txtTongTien.Text = Functions.GetFieldValues("SELECT SUM(DoanhThuSanPham) FROM tblDoanhThu");
             rdTheoKhoang.Checked = false;
             rdTheoNgay.Checked = false;
             mskTheoNgay.Enabled = false;
@@ -135,23 +155,110 @@ namespace QuanLyQuanCafe.Forms
             lblBangChu.Text = "Bằng chữ: " + Functions.ChuyenSoSangChu(txtTongTien.Text);
         }
 
-        private void dgvBaoCaoDoanhThu_Click(object sender, EventArgs e)
+        private void btnInBaoCao_Click(object sender, EventArgs e)
         {
-            string ma;
+            COMExcel.Application exApp = new COMExcel.Application();
+            COMExcel.Workbook exBook;
+            COMExcel.Worksheet exSheet;
+            COMExcel.Range exRange;
+            string sql;
+            int hang = 0, cot = 0;
 
-            if (tblDT.Rows.Count == 0)
+            exBook = exApp.Workbooks.Add(COMExcel.XlWBATemplate.xlWBATWorksheet);
+            exSheet = exBook.Worksheets[1];
+            exRange = exSheet.Cells[1, 1];
+
+            exRange.Range["C10: D10:E10"].Font.Size = 14;
+            exRange.Range["C10: D10:E10"].Font.Name = "Times new roman";
+            exRange.Range["C10: D10:E10"].Font.Bold = true;
+            exRange.Range["C10:D10:E10"].Font.ColorIndex = 3; //Màu đỏ
+            exRange.Range["C10:D10:E10"].MergeCells = true;
+            exRange.Range["C10: D10:E10"].HorizontalAlignment = COMExcel.XlHAlign.xlHAlignCenter;
+            exRange.Range["C10: D10:E10"].Value = "Báo cáo doanh thu ";
+
+            int rowCount = tblDT.Rows.Count;
+            int colCount = tblDT.Columns.Count;
+
+            // Phạm vi bắt đầu từ ô A1 và kết thúc ở ô cuối cùng chứa dữ liệu
+            COMExcel.Range dataRange = exSheet.Range[exSheet.Cells[12, 1], exSheet.Cells[rowCount + 12, colCount + 1]];
+
+            // Thiết lập viền cho phạm vi dữ liệu
+            dataRange.Borders.LineStyle = COMExcel.XlLineStyle.xlContinuous;
+
+            exRange.Range["H12:H12"].Value = "Tổng tiền:";
+
+            exRange.Range["I12:I12"].Value = txtTongTien.Text;
+
+            exRange.Range["A12:F12"].Font.Bold = true;
+            exRange.Range["A12:F12"].HorizontalAlignment = COMExcel.XlHAlign.xlHAlignCenter;
+            exRange.Range["A12:A12"].Value = "STT";
+            exRange.Range["B12:B12"].Value = "Ngày bán";
+            exRange.Range["B12:B12"].ColumnWidth = 9.7;
+            exRange.Range["C12:C12"].Value = "Tên sản phẩm";
+            exRange.Range["C12:C12"].ColumnWidth = 25;
+            exRange.Range["D12:D12"].Value = "Số lượng bán";
+            exRange.Range["D12:D12"].ColumnWidth = 15;
+            exRange.Range["E12:E12"].Value = "Giá bán sản phẩm";
+            exRange.Range["E12:E12"].ColumnWidth = 15;
+            exRange.Range["F12:F12"].Value = "Doanh thu sản phẩm ";
+            exRange.Range["F12:F12"].ColumnWidth = 20;
+
+            for (hang = 0; hang < tblDT.Rows.Count; hang++)
             {
-                MessageBox.Show("Không có dữ liệu!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
+                exSheet.Cells[1][hang + 13] = hang + 1;
+                for (cot = 0; cot < tblDT.Columns.Count; cot++)
+                {
+                    exSheet.Cells[cot + 2][hang + 13] = tblDT.Rows[hang][cot].ToString();
+                }
             }
-            mskTheoNgay.Text = dgvBaoCaoDoanhThu.CurrentRow.Cells["ngayban"].Value.ToString();
+            exApp.Visible = true;
+        }
 
-            ma = dgvBaoCaoDoanhThu.CurrentRow.Cells["TenSP"].Value.ToString();
-            cboTenSP.Text = Functions.GetFieldValues("SELECT TenSP FROM tblSanPham WHERE TenSP = N'" + ma + "'");
+        private void rdTheoNgay_CheckedChanged(object sender, EventArgs e)
+        {
+            if (rdTheoNgay.Checked == true)
+                mskTheoNgay.Enabled = true;
+            else
+            {
+                mskTheoNgay.Enabled = false;
+                mskTheoNgay.Text = "";
+            }
+        }
 
-            txtSoLuong.Text = dgvBaoCaoDoanhThu.CurrentRow.Cells["SoLuongBan"].Value.ToString();
-            txtGiaBan.Text = dgvBaoCaoDoanhThu.CurrentRow.Cells["GiaBan"].Value.ToString();
-            txtDoanhThu.Text = dgvBaoCaoDoanhThu.CurrentRow.Cells["DoanhThu"].Value.ToString();
+        private void rdTheoKhoang_CheckedChanged(object sender, EventArgs e)
+        {
+            if (rdTheoKhoang.Checked == true)
+                grbKhoang.Enabled = true;
+            else
+            {
+                grbKhoang.Enabled = false;
+                mskTheoKhoang1.Text = "";
+                mskTheoKhoang2.Text = "";
+            }
+        }
+
+        private void txtSoLuong_KeyPress_1(object sender, KeyPressEventArgs e)
+        {
+            if (((e.KeyChar >= '0') && (e.KeyChar <= '9')) || (Convert.ToInt32(e.KeyChar) == 8))
+                e.Handled = false;
+            else
+                e.Handled = true;
+        }
+
+        private void txtGiaBan_KeyPress_1(object sender, KeyPressEventArgs e)
+        {
+            if (((e.KeyChar >= '0') && (e.KeyChar <= '9')) || (Convert.ToInt32(e.KeyChar) == 8))
+                e.Handled = false;
+            else
+                e.Handled = true;
+        }
+
+        private void txtDoanhThu_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (((e.KeyChar >= '0') && (e.KeyChar <= '9')) || (Convert.ToInt32(e.KeyChar) == 8))
+                e.Handled = false;
+            else
+                e.Handled = true;
         }
     }
 }

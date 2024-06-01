@@ -112,9 +112,13 @@ namespace QuanLyQuanCafe.Forms
         private void ResetValues()
         {
             textMaHD.Text = "";
-            textNgayban.Text = DateTime.Now.ToShortDateString();
+            textNgayban.Text = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
             comboMaNV.Text = "";
+            textTenNV.Text = "";
             comboMaKH.Text = "";
+            textTenKH.Text = "";
+            textDiachi.Text = "";
+            textDienthoai.Text = "";
             textTongtien.Text = "0";
             labelBangchu.Text = "Bằng chữ: ";
             comboMahang.Text = "";
@@ -151,7 +155,7 @@ namespace QuanLyQuanCafe.Forms
                     return;
                 }
                 //lưu thông tin chung vào bảng tblhdban    
-                sql = "insert into tblHoaDonBan(MaHDB, NgayBan, MaNV, MaKH, TongTien) values(N'" + textMaHD.Text.Trim() + "', '" + Functions.ConvertDateTime(textNgayban.Text.Trim()) + "',N'" + comboMaNV.SelectedValue + "',N'" + comboMaKH.SelectedValue + "'," + textTongtien.Text + ")";
+                sql = "insert into tblHoaDonBan(MaHDB, NgayBan, MaNV, MaKH, TongTien) values(N'" + textMaHD.Text.Trim() + "', '" + DateTime.ParseExact(textNgayban.Text.Trim(), "dd/MM/yyyy HH:mm:ss", null).ToString("yyyy-MM-dd HH:mm:ss") + "',N'" + comboMaNV.SelectedValue + "',N'" + comboMaKH.SelectedValue + "'," + textTongtien.Text + ")";
                 Functions.RunSQL(sql);
             }
 
@@ -215,7 +219,9 @@ namespace QuanLyQuanCafe.Forms
         private void ResetValuesHang()
         {
             comboMahang.Text = "";
+            textTenhang.Text = "";
             textSoluong.Text = "";
+            textDongia.Text = "";
             textGiamgia.Text = "0";
             textThanhtien.Text = "0";
         }

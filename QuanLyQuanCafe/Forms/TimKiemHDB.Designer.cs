@@ -40,10 +40,10 @@
             this.btnTimLai = new System.Windows.Forms.Button();
             this.btnDong = new System.Windows.Forms.Button();
             this.gbxHoaDonBan = new System.Windows.Forms.GroupBox();
+            this.dtpNgayBan = new System.Windows.Forms.DateTimePicker();
             this.cboMaKhachHang = new System.Windows.Forms.ComboBox();
             this.cboMaNhanVien = new System.Windows.Forms.ComboBox();
             this.cboMaHDB = new System.Windows.Forms.ComboBox();
-            this.dtpNgayBan = new System.Windows.Forms.DateTimePicker();
             this.labelChuthich = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dgvTimKiemHDB)).BeginInit();
             this.gbxHoaDonBan.SuspendLayout();
@@ -180,6 +180,16 @@
             this.gbxHoaDonBan.TabStop = false;
             this.gbxHoaDonBan.Text = "Thông tin tìm kiếm";
             // 
+            // dtpNgayBan
+            // 
+            this.dtpNgayBan.CustomFormat = "dd/MM/yyyy";
+            this.dtpNgayBan.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.dtpNgayBan.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.dtpNgayBan.Location = new System.Drawing.Point(562, 35);
+            this.dtpNgayBan.Name = "dtpNgayBan";
+            this.dtpNgayBan.Size = new System.Drawing.Size(187, 24);
+            this.dtpNgayBan.TabIndex = 148;
+            // 
             // cboMaKhachHang
             // 
             this.cboMaKhachHang.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -206,16 +216,6 @@
             this.cboMaHDB.Name = "cboMaHDB";
             this.cboMaHDB.Size = new System.Drawing.Size(187, 24);
             this.cboMaHDB.TabIndex = 145;
-            // 
-            // dtpNgayBan
-            // 
-            this.dtpNgayBan.CustomFormat = "dd/MM/yyyy";
-            this.dtpNgayBan.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.dtpNgayBan.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.dtpNgayBan.Location = new System.Drawing.Point(562, 35);
-            this.dtpNgayBan.Name = "dtpNgayBan";
-            this.dtpNgayBan.Size = new System.Drawing.Size(187, 24);
-            this.dtpNgayBan.TabIndex = 148;
             // 
             // labelChuthich
             // 
