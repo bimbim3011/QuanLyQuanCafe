@@ -54,6 +54,7 @@
             this.btnInBaoCao = new System.Windows.Forms.Button();
             this.btnHienThi = new System.Windows.Forms.Button();
             this.lblBangChu = new System.Windows.Forms.Label();
+            this.btnTimLai = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.grbKhoang.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvBaoCaoDoanhThu)).BeginInit();
@@ -71,6 +72,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.btnTimLai);
             this.groupBox1.Controls.Add(this.btnTimKiem);
             this.groupBox1.Controls.Add(this.txtDoanhThu);
             this.groupBox1.Controls.Add(this.label7);
@@ -93,9 +95,9 @@
             // 
             // btnTimKiem
             // 
-            this.btnTimKiem.Location = new System.Drawing.Point(1237, 175);
+            this.btnTimKiem.Location = new System.Drawing.Point(1159, 175);
             this.btnTimKiem.Name = "btnTimKiem";
-            this.btnTimKiem.Size = new System.Drawing.Size(97, 27);
+            this.btnTimKiem.Size = new System.Drawing.Size(80, 27);
             this.btnTimKiem.TabIndex = 2;
             this.btnTimKiem.Text = "Tìm kiếm";
             this.btnTimKiem.UseVisualStyleBackColor = true;
@@ -314,6 +316,16 @@
             this.lblBangChu.Size = new System.Drawing.Size(0, 16);
             this.lblBangChu.TabIndex = 13;
             // 
+            // btnTimLai
+            // 
+            this.btnTimLai.Location = new System.Drawing.Point(1254, 175);
+            this.btnTimLai.Name = "btnTimLai";
+            this.btnTimLai.Size = new System.Drawing.Size(80, 27);
+            this.btnTimLai.TabIndex = 14;
+            this.btnTimLai.Text = "Tìm lại";
+            this.btnTimLai.UseVisualStyleBackColor = true;
+            this.btnTimLai.Click += new System.EventHandler(this.btnTimLai_Click);
+            // 
             // frmBaoCaoDoanhThu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -371,5 +383,6 @@
         private System.Windows.Forms.Button btnInBaoCao;
         private System.Windows.Forms.Button btnHienThi;
         private System.Windows.Forms.Label lblBangChu;
+        private System.Windows.Forms.Button btnTimLai;
     }
 }

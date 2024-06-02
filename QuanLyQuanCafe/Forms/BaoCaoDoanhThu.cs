@@ -24,7 +24,6 @@ namespace QuanLyQuanCafe.Forms
 
         private void frmBaoCaoDoanhThu_Load(object sender, EventArgs e)
         {
-            Load_DataGridView("SELECT * FROM tblDoanhThu");
             Functions.FillCombo("SELECT TenSP FROM tblSanPham", cboTenSP, "TenSP", "TenSP");
             cboTenSP.SelectedIndex = -1;
             txtTongTien.Text = Functions.GetFieldValues("SELECT SUM(DoanhThuSanPham) FROM tblDoanhThu");
@@ -33,16 +32,14 @@ namespace QuanLyQuanCafe.Forms
             lblBangChu.Text = "Bằng chữ: " + Functions.ChuyenSoSangChu(txtTongTien.Text);
             txtTongTien.Enabled = false;
         }
-        private void Load_DataGridView(string sql)
+        private void Load_DataGridView()
         {
-            tblDT = Functions.GetDataToTable(sql);
-            dgvBaoCaoDoanhThu.DataSource = tblDT;
             dgvBaoCaoDoanhThu.Columns[0].HeaderText = "Ngày bán";
-
             dgvBaoCaoDoanhThu.Columns[1].HeaderText = "Tên sản phẩm";
             dgvBaoCaoDoanhThu.Columns[2].HeaderText = "Số lượng bán";
             dgvBaoCaoDoanhThu.Columns[3].HeaderText = "Đơn giá bán";
             dgvBaoCaoDoanhThu.Columns[4].HeaderText = "Doanh thu";
+            dgvBaoCaoDoanhThu.AllowUserToAddRows = false;
             dgvBaoCaoDoanhThu.EditMode = DataGridViewEditMode.EditProgrammatically;
         }
         private void Reset()
@@ -52,6 +49,9 @@ namespace QuanLyQuanCafe.Forms
             txtTongTien.Text = "";
             txtSoLuong.Text = "0";
             txtGiaBan.Text = "0";
+            mskTheoNgay.Text = "  /  /";
+            mskTheoKhoang1.Text = "  /  /";
+            mskTheoKhoang2.Text = "  /  /";
             txtSoLuong.Enabled = false;
             txtGiaBan.Enabled = false;
             txtDoanhThu.Text = "0";
@@ -67,13 +67,12 @@ namespace QuanLyQuanCafe.Forms
                 MessageBox.Show("Không có dữ liệu!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            mskTheoNgay.Text = dgvBaoCaoDoanhThu.CurrentRow.Cells["NgayBan"].Value.ToString();
 
             ma = dgvBaoCaoDoanhThu.CurrentRow.Cells["TenSP"].Value.ToString();
             cboTenSP.Text = Functions.GetFieldValues("SELECT TenSP FROM tblSanPham WHERE TenSP = N'" + ma + "'");
-
             txtSoLuong.Text = dgvBaoCaoDoanhThu.CurrentRow.Cells["SoLuongBan"].Value.ToString();
             txtGiaBan.Text = dgvBaoCaoDoanhThu.CurrentRow.Cells["GiaSanPham"].Value.ToString();
+            mskTheoNgay.Text = dgvBaoCaoDoanhThu.CurrentRow.Cells["NgayBan"].Value.ToString();
             txtDoanhThu.Text = dgvBaoCaoDoanhThu.CurrentRow.Cells["DoanhThuSanPham"].Value.ToString();
         }
 
@@ -83,6 +82,11 @@ namespace QuanLyQuanCafe.Forms
             if (cboTenSP.SelectedValue == null && txtGiaBan.Text == "" && mskTheoNgay.Text == "  /  /" && txtDoanhThu.Text == null && mskTheoKhoang1.Text == "  /  /" && mskTheoKhoang2.Text == "  /  /")
             {
                 MessageBox.Show("Hãy nhập ít nhất 1 dữ liệu để tìm", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if ((mskTheoKhoang1.Text != "  /  /" && mskTheoKhoang2.Text == "  /  /") || (mskTheoKhoang1.Text == "  /  /" && mskTheoKhoang2.Text != "  /  /"))
+            {
+                MessageBox.Show("Bạn phải nhập đủ cả ngày bắt đầu và ngày kết thúc", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             sql = "SELECT * FROM tblDoanhThu where 1=1";
@@ -104,7 +108,7 @@ namespace QuanLyQuanCafe.Forms
                     mskTheoNgay.Text = "";
                     return;
                 }
-                sql += " and NgayBan = '" + Functions.ConvertDateTime(mskTheoNgay.Text) + "'";
+                sql += " and CONVERT(date, NgayBan) = '" + Functions.ConvertDateTime(mskTheoNgay.Text) + "'";
             }
             if (mskTheoKhoang1.Text != "  /  /" && mskTheoKhoang2.Text != "  /  /")
             {
@@ -123,22 +127,43 @@ namespace QuanLyQuanCafe.Forms
                     mskTheoKhoang1.Text = "";
                     return;
                 }
-                sql += " AND NgayBan BETWEEN '" + Functions.ConvertDateTime(mskTheoKhoang1.Text) + "' AND '" + Functions.ConvertDateTime(mskTheoKhoang2.Text) + "'";
+                sql += " AND (CONVERT(date, NgayBan) BETWEEN '" + Functions.ConvertDateTime(mskTheoKhoang1.Text) + "' AND '" + Functions.ConvertDateTime(mskTheoKhoang2.Text) + "'";
             }
             if (txtDoanhThu.Text != "")
             {
                 sql += " and DoanhThuSanPham >= " + txtDoanhThu.Text;
             }
 
-            Load_DataGridView(sql);
-            txtTongTien.Text = Functions.GetFieldValues("SELECT SUM(DoanhThuSanPham) FROM  tblDoanhThu WHERE " + sql.Substring(sql.IndexOf("where") + 5));
-            lblBangChu.Text = "Bằng chữ: " + Functions.ChuyenSoSangChu(txtTongTien.Text);
+            tblDT = Class.Functions.GetDataToTable(sql);
+            if (tblDT.Rows.Count == 0)
+            {
+                MessageBox.Show("Không có hóa đơn bán nào thỏa mãn điều kiện!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                Reset();
+                dgvBaoCaoDoanhThu.DataSource = tblDT;
+                Load_DataGridView();
+            }
+            else
+            {
+                MessageBox.Show("Có " + tblDT.Rows.Count + " hóa đơn bán thỏa mãn điều kiện", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                dgvBaoCaoDoanhThu.DataSource = tblDT;
+                Load_DataGridView();
+                txtTongTien.Text = Functions.GetFieldValues("SELECT SUM(DoanhThuSanPham) FROM  tblDoanhThu WHERE " + sql.Substring(sql.IndexOf("where") + 5));
+                lblBangChu.Text = "Bằng chữ:    " + Functions.ChuyenSoSangChu(txtTongTien.Text);
+            }
+        }
+
+        private void btnTimLai_Click(object sender, EventArgs e)
+        {
+            Reset();
+            dgvBaoCaoDoanhThu.DataSource = null;
         }
 
         private void btnHienThi_Click(object sender, EventArgs e)
         {
             string sql = "SELECT * FROM tblDoanhThu";
-            Load_DataGridView(sql);
+            tblDT = Class.Functions.GetDataToTable(sql);
+            dgvBaoCaoDoanhThu.DataSource = tblDT;
+            Load_DataGridView();
             Functions.FillCombo("SELECT TenSP FROM tblSanPham", cboTenSP, "TenSP", "TenSP");
             cboTenSP.SelectedIndex = -1;
             txtGiaBan.Text = "";
@@ -161,7 +186,7 @@ namespace QuanLyQuanCafe.Forms
             COMExcel.Workbook exBook;
             COMExcel.Worksheet exSheet;
             COMExcel.Range exRange;
-            string sql;
+
             int hang = 0, cot = 0;
 
             exBook = exApp.Workbooks.Add(COMExcel.XlWBATemplate.xlWBATWorksheet);
@@ -260,5 +285,7 @@ namespace QuanLyQuanCafe.Forms
             else
                 e.Handled = true;
         }
+
+        
     }
 }
